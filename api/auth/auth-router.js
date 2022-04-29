@@ -15,11 +15,9 @@ router.post(
   validateUser,
   validateUserNotExists,
   (req, res, next) => {
-    // res.end('implement register, please!');
     let user = req.body;
     const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS);
     user.password = hash;
-
     User.add(user)
       .then((saved) => {
         res.status(201).json({ ...saved });
@@ -65,9 +63,7 @@ function generateToken(user) {
 }
 
 router.post("/login", validateUser, (req, res, next) => {
-  // res.end("implement login, please!");
   let { username, password } = req.body;
-
   User.findBy({ username }).then(([user]) => {
     if (user && bcrypt.compareSync(password, user.password)) {
       const token = generateToken(user);

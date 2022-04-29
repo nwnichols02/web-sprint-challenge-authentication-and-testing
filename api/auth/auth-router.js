@@ -65,11 +65,11 @@ router.post("/login", validateUser, (req, res, next) => {
       if(user && bcrypt.compareSync(password, user.password)){
         const token = generateToken(user)
         res.status(200).json({
-          message: `Welcome, ${user.username}`, 
+          message: `welcome, ${user.username}`, 
           token,
         })
       } else {
-        next({status: 401, message: 'Invalid Credentials'})
+        next({status: 401, message: 'invalid credentials'})
       }
     })
   /*
@@ -96,5 +96,7 @@ router.post("/login", validateUser, (req, res, next) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
 });
+
+
 
 module.exports = router;

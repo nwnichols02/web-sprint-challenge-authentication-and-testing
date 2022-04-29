@@ -5,20 +5,27 @@ const router = require("express").Router();
 const User = require("./users-model");
 
 const { BCRYPT_ROUNDS, JWT_SECRET } = require("../../config/index");
-const { validateUser, validateUserNotExists } = require('../middleware/auth-middleware');
+const {
+  validateUser,
+  validateUserNotExists,
+} = require("../middleware/auth-middleware");
 
-router.post("/register", validateUser, validateUserNotExists, (req, res, next) => {
-  // res.end('implement register, please!');
-  let user = req.body;
-  const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS);
-  user.password = hash;
+router.post(
+  "/register",
+  validateUser,
+  validateUserNotExists,
+  (req, res, next) => {
+    // res.end('implement register, please!');
+    let user = req.body;
+    const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS);
+    user.password = hash;
 
-  User.add(user)
-    .then((saved) => {
-      res.status(201).json({ ...saved });
-    })
-    .catch(next);
-  /*
+    User.add(user)
+      .then((saved) => {
+        res.status(201).json({ ...saved });
+      })
+      .catch(next);
+    /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -43,35 +50,35 @@ router.post("/register", validateUser, validateUserNotExists, (req, res, next) =
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
+  }
+);
 
 function generateToken(user) {
   const payload = {
     subject: user.id,
     username: user.username,
-  }
+  };
   const options = {
-    expiresIn: '1d',
-  }
-  return jwt.sign(payload, JWT_SECRET, options)
+    expiresIn: "1d",
+  };
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 router.post("/login", validateUser, (req, res, next) => {
   // res.end("implement login, please!");
-  let { username, password }= req.body;
+  let { username, password } = req.body;
 
-  User.findBy({username})
-    .then(([user]) => {
-      if(user && bcrypt.compareSync(password, user.password)){
-        const token = generateToken(user)
-        res.status(200).json({
-          message: `welcome, ${user.username}`, 
-          token,
-        })
-      } else {
-        next({status: 401, message: 'invalid credentials'})
-      }
-    })
+  User.findBy({ username }).then(([user]) => {
+    if (user && bcrypt.compareSync(password, user.password)) {
+      const token = generateToken(user);
+      res.status(200).json({
+        message: `welcome, ${user.username}`,
+        token,
+      });
+    } else {
+      next({ status: 401, message: "invalid credentials" });
+    }
+  });
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -96,7 +103,5 @@ router.post("/login", validateUser, (req, res, next) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
 });
-
-
 
 module.exports = router;
